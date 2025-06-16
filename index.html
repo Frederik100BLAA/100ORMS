@@ -3,77 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <title>Login – 100Blaa Portal</title>
-  <script src="https://cdn.auth0.com/js/auth0-spa-js/1.19/auth0-spa-js.production.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       padding-top: 100px;
-      background-color: #f5f5f5;
+      background-color: #f4f4f4;
     }
-    h1 {
-      font-size: 2em;
+    .g_id_signin {
+      margin-top: 20px;
     }
     button {
       font-size: 1em;
       padding: 10px 20px;
-      cursor: pointer;
-      border: none;
-      background-color: #000;
-      color: #fff;
-      border-radius: 6px;
-    }
-    #logout {
-      background-color: #c00;
       margin-top: 20px;
+      background-color: #000;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <h1>Velkommen til 100Blaa Portal</h1>
   <p>Log ind med din Google-konto</p>
-  <button id="login">Log ind med Google</button>
+
+  <!-- Google Sign-In -->
+  <div id="g_id_onload"
+       data-client_id="508230159904-u7jph8c2130qmesgjg0svln3do7jdmdv.apps.googleusercontent.com"
+       data-context="signin"
+       data-callback="handleCredentialResponse"
+       data-auto_prompt="false">
+  </div>
+
+  <div class="g_id_signin"
+       data-type="standard"
+       data-shape="pill"
+       data-theme="outline"
+       data-text="signin_with"
+       data-size="large">
+  </div>
 
   <script>
-    let auth0Client;
+    function handleCredentialResponse(response) {
+      const jwt = response.credential;
+      const payload = JSON.parse(atob(jwt.split('.')[1]));
 
-    async function initAuth0() {
-      auth0Client = await createAuth0Client({
-        domain: "dev-ag2ng5zv6thm8u0g.eu.auth0.com",
-        client_id: "AgQpeZvKn8UAfeIWK3g2ar5GK63vBet8",
-        cacheLocation: "localstorage"
-      });
+      // List of allowed users
+      const allowedEmails = [
+        "you@100blaa.com",
+        "artist1@gmail.com",
+        "karoline@external.com"
+      ];
 
-      // Handle redirect callback
-      if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
-        await auth0Client.handleRedirectCallback();
-        window.history.replaceState({}, document.title, "/");
+      if (!allowedEmails.includes(payload.email)) {
+        alert("Du har ikke adgang til portalen.");
+        return;
       }
 
-      const isAuthenticated = await auth0Client.isAuthenticated();
-
-      if (isAuthenticated) {
-        const user = await auth0Client.getUser();
-        document.body.innerHTML = `
-          <h2>Velkommen, ${user.name}</h2>
-          <p>Du er nu logget ind.</p>
-          <button id="logout">Log ud</button>
-        `;
-        document.getElementById("logout").onclick = () =>
-          auth0Client.logout({ returnTo: window.location.origin });
-      }
+      // Show welcome message
+      document.body.innerHTML = `
+        <h2>Velkommen, ${payload.name}</h2>
+        <p>Email: ${payload.email}</p>
+        <p>Du er nu logget ind.</p>
+        <button onclick="signOut()">Log ud</button>
+      `;
     }
 
-    window.onload = async () => {
-      await initAuth0();
-
-      const loginButton = document.getElementById("login");
-      if (loginButton) {
-        loginButton.onclick = () => {
-          auth0Client.loginWithRedirect({ redirect_uri: window.location.origin });
-        };
-      }
-    };
+    function signOut() {
+      google.accounts.id.disableAutoSelect();
+      window.location.reload();
+    }
   </script>
 </body>
 </html>
