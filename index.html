@@ -59,8 +59,9 @@
       const payload = JSON.parse(atob(jwt.split('.')[1]));
       const email = payload.email;
 
-      const endpoint = "https://script.google.com/macros/s/AKfycbwRWBFb5FnubEgoOU8ImWxgT3MuWmC6g_nezlo9U_Tvxjw7L9QMmSVkzgSFtlv6JM1aZw/exec";
-      
+      // Proxy URL using corsproxy.io
+      const endpoint = "https://corsproxy.io/?https://script.google.com/macros/s/AKfycbwRWBFb5FnubEgoOU8ImWxgT3MuWmC6g_nezlo9U_Tvxjw7L9QMmSVkzgSFtlv6JM1aZw/exec";
+
       try {
         const res = await fetch(`${endpoint}?email=${encodeURIComponent(email)}`);
         const data = await res.json();
