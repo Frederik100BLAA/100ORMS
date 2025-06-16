@@ -2,10 +2,66 @@
 <html lang="da">
 <head>
   <meta charset="UTF-8">
-  <title>100Blaa</title>
+  <title>Login – 100Blaa Portal</title>
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/1.19/auth0-spa-js.production.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      font-size: 2em;
+    }
+    button {
+      font-size: 1em;
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background-color: #000;
+      color: #fff;
+      border-radius: 6px;
+    }
+    #logout {
+      background-color: #c00;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Velkommen til 100Blaa</h1>
-  <p>Dette er en testside hostet via GitHub Pages.</p>
+  <h1>Velkommen til 100Blaa Portal</h1>
+  <p>Log ind med din Google-konto</p>
+  <button id="login">Log ind med Google</button>
+
+  <script type="module">
+    const auth0 = await createAuth0Client({
+      domain: "dev-ag2ng5zv6thm8u0g.eu.auth0.com",
+      client_id: "AgQpeZvKn8UAfeIWK3g2ar5GK63vBet8",
+      cacheLocation: 'localstorage',
+    });
+
+    // Handle redirect back from Auth0
+    if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
+      await auth0.handleRedirectCallback();
+      window.history.replaceState({}, document.title, "/");
+    }
+
+    const isAuthenticated = await auth0.isAuthenticated();
+
+    if (isAuthenticated) {
+      const user = await auth0.getUser();
+      document.body.innerHTML = `
+        <h2>Velkommen, ${user.name}</h2>
+        <p>Du er nu logget ind.</p>
+        <button id="logout">Log ud</button>
+      `;
+      document.getElementById("logout").onclick = () => auth0.logout({ returnTo: window.location.origin });
+    } else {
+      document.getElementById("login").onclick = () => auth0.loginWithRedirect({
+        redirect_uri: window.location.origin
+      });
+    }
+  </script>
 </body>
 </html>
