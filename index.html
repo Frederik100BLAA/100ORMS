@@ -59,9 +59,8 @@
       const payload = JSON.parse(atob(jwt.split('.')[1]));
       const email = payload.email;
 
-      // Replace this with your deployed Apps Script Web App URL:
-      const endpoint = "https://script.google.com/macros/s/AKfycbw6MSn8Tow0jOesHGcZLB0CD7ga7CsNfJX5jDYxxh-ulzgGp9VbFfTtb4rfeVRYRFlFyQ/exec";
-
+      const endpoint = "https://script.google.com/macros/s/AKfycbwRWBFb5FnubEgoOU8ImWxgT3MuWmC6g_nezlo9U_Tvxjw7L9QMmSVkzgSFtlv6JM1aZw/exec";
+      
       try {
         const res = await fetch(`${endpoint}?email=${encodeURIComponent(email)}`);
         const data = await res.json();
