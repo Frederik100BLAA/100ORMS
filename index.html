@@ -24,6 +24,13 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 4px 0;
+    }
   </style>
 </head>
 <body>
@@ -47,16 +54,44 @@
   </div>
 
   <script>
-    function handleCredentialResponse(response) {
+    async function handleCredentialResponse(response) {
       const jwt = response.credential;
       const payload = JSON.parse(atob(jwt.split('.')[1]));
+      const email = payload.email;
 
-      document.body.innerHTML = `
-        <h2>Velkommen, ${payload.name}</h2>
-        <p>Email: ${payload.email}</p>
-        <p>Du er nu logget ind.</p>
-        <button onclick="signOut()">Log ud</button>
-      `;
+      // Replace this with your deployed Apps Script Web App URL:
+      const endpoint = "https://script.google.com/macros/s/AKfycbw6MSn8Tow0jOesHGcZLB0CD7ga7CsNfJX5jDYxxh-ulzgGp9VbFfTtb4rfeVRYRFlFyQ/exec";
+
+      try {
+        const res = await fetch(`${endpoint}?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        if (data.role === "label") {
+          document.body.innerHTML = `
+            <h2>Velkommen, ${payload.name} (Label)</h2>
+            <p>Du har adgang til administrationsportalen.</p>
+            <button onclick="signOut()">Log ud</button>
+          `;
+        } else if (data.role === "artist") {
+          const releases = data.releases.slice(1);
+          const rows = releases.map(row => `<li>${row[2]} – ${row[3]}</li>`).join("");
+
+          document.body.innerHTML = `
+            <h2>Velkommen, ${payload.name} (${data.artist})</h2>
+            <h3>Dine udgivelser:</h3>
+            <ul>${rows}</ul>
+            <button onclick="signOut()">Log ud</button>
+          `;
+        }
+      } catch (err) {
+        console.error("Login-fejl:", err);
+        alert("Noget gik galt. Prøv igen.");
+      }
     }
 
     function signOut() {
