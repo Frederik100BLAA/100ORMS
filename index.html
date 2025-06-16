@@ -47,29 +47,16 @@
   </div>
 
   <script>
-    async function handleCredentialResponse(response) {
+    function handleCredentialResponse(response) {
       const jwt = response.credential;
       const payload = JSON.parse(atob(jwt.split('.')[1]));
-      const email = payload.email;
 
-      try {
-        const res = await fetch(`https://script.google.com/macros/s/AKfycbw6MSn8Tow0jOesHGcZLB0CD7ga7CsNfJX5jDYxxh-ulzgGp9VbFfTtb4rfeVRYRFlFyQ/exec?email=${encodeURIComponent(email)}`);
-        const data = await res.json();
-
-        if (data.allowed) {
-          document.body.innerHTML = `
-            <h2>Velkommen, ${payload.name}</h2>
-            <p>Email: ${payload.email}</p>
-            <p>Du er nu logget ind.</p>
-            <button onclick="signOut()">Log ud</button>
-          `;
-        } else {
-          alert("Du har ikke adgang til portalen.");
-        }
-      } catch (err) {
-        console.error("Access check failed:", err);
-        alert("Der opstod en fejl under godkendelsen.");
-      }
+      document.body.innerHTML = `
+        <h2>Velkommen, ${payload.name}</h2>
+        <p>Email: ${payload.email}</p>
+        <p>Du er nu logget ind.</p>
+        <button onclick="signOut()">Log ud</button>
+      `;
     }
 
     function signOut() {
