@@ -59,39 +59,34 @@
       const payload = JSON.parse(atob(jwt.split('.')[1]));
       const email = payload.email;
 
-      const rawEndpoint = "https://script.google.com/macros/s/AKfycbzGKX_c2OeBmhY-83PfObI5V2gvvpFj5u65ZQFg6LS2DKXTfNsi2RiKxWaoGMzvhzM89w/exec";
-      const endpoint = `https://corsproxy.io/?${encodeURIComponent(rawEndpoint)}?email=${encodeURIComponent(email)}`;
+      // Replace with your deployed Web App URL
+      const rawUrl = `https://script.google.com/macros/s/PASTE-YOUR-SCRIPT-ID-HERE/exec?email=${encodeURIComponent(email)}`;
 
       try {
-        const res = await fetch(endpoint);
-        const text = await res.text();
-        const data = JSON.parse(text); // Because some proxies return it as text not JSON directly
+        const res = await fetch(rawUrl);
+        const data = await res.json();
 
         if (data.error) {
           alert(data.error);
           return;
         }
 
-        if (data.role === "label") {
+        if (data.label) {
           document.body.innerHTML = `
             <h2>Velkommen, ${payload.name} (Label)</h2>
             <p>Du har adgang til administrationsportalen.</p>
             <button onclick="signOut()">Log ud</button>
           `;
-        } else if (data.role === "artist") {
-          const releases = data.releases.slice(1);
-          const rows = releases.map(row => `<li>${row[2]} – ${row[3]}</li>`).join("");
-
+        } else if (data.artist) {
           document.body.innerHTML = `
-            <h2>Velkommen, ${payload.name} (${data.artist})</h2>
-            <h3>Dine udgivelser:</h3>
-            <ul>${rows}</ul>
+            <h2>Velkommen, ${payload.name}</h2>
+            <p>Du er logget ind som artist: <strong>${data.artist}</strong></p>
             <button onclick="signOut()">Log ud</button>
           `;
         }
       } catch (err) {
         console.error("Login-fejl:", err);
-        alert("Noget gik galt. Prøv igen.");
+        alert("Noget gik galt under login. Prøv igen.");
       }
     }
 
