@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Label Oversigt - 100ORMS</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <link rel="stylesheet" href="css/label.css" />
+</head>
+<body>
+  <div class="sidebar">
+  <div class="sidebar-top">
+    <img src="css/img/logo_sidebar.png" alt="100ORM Logo" />
+    <div class="sidebar-title">O R M</div>
+  </div>
+
+  <div class="sidebar-nav-wrapper"> 
+    <nav class="sidebar-nav">
+      <a href="#" class="active">Oversigt</a>
+      <a href="#">Sange</a>
+      <a href="#">Udgivelser</a>
+      <a href="#">Artister</a>
+    </nav>
+  </div>
+
+  <div class="sidebar-bottom">
+    <button class="ny-button">NY</button>
+  </div>
+</div>
+
+
+  <div class="main">
+  <div class="revenue-section">
+    <p class="label">Total indtægt:</p>
+    <div class="total-indtaegt" id="totalRevenue">00.000,00 kr.</div>
+
+    <div class="filter-section">
+      <label for="periodeYear">Periode:</label>
+      <select id="periodeYear" onchange="updateMonthOptionsAndLoad()">
+        <option value="Alltime">Alltime</option>
+      </select>
+      <select id="periodeMonth" onchange="loadDashboardData()" style="display: none;"></select>
+    </div>
+  </div>
+
+  <div class="bottom-tables">
+  <div class="table-block">
+    <h2 class="table-heading">Bedst indtjendende artister:</h2>
+    <table class="artist-table">
+      <tbody id="topArtistsTable">
+        <!-- Rows will be injected via JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-block">
+    <h2 class="table-heading">Bedst indtjendende sange:</h2>
+    <table class="song-table">
+      <tbody id="topSongsTable">
+        <!-- Rows will be injected via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  <script>
+let idToken = null;
+
+firebase.initializeApp({
+  apiKey: "AIzaSyCsRhXGH4eO1qJ2AT4KpeRCzTLo_as7r6Q",
+  authDomain: "orms-system.firebaseapp.com",
+  projectId: "orms-system"
+});
+
+// ✅ This function must be defined outside auth block
+function updateMonthOptionsAndLoad() {
+  const year = document.getElementById("periodeYear").value;
+  const monthDropdown = document.getElementById("periodeMonth");
+
+  if (year === "Alltime") {
+    monthDropdown.style.display = "none";
+  } else {
+    monthDropdown.style.display = "inline-block";
+  }
+
+  loadDashboardData();
+}
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  idToken = await user.getIdToken();
+
+  const res = await fetch("https://checkuserrole-508230159904.europe-west1.run.app", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${idToken}`
+    }
+  });
+
+  const data = await res.json();
+  if (data.role !== "label") {
+    alert("Du har ikke adgang til denne side.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // ✅ Populate year and month dropdowns
+  const currentYear = new Date().getFullYear();
+  const yearDropdown = document.getElementById("periodeYear");
+  for (let y = currentYear; y >= 2022; y--) {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    yearDropdown.appendChild(opt);
+  }
+
+  const monthDropdown = document.getElementById("periodeMonth");
+  const months = [
+    { value: "01", name: "Januar" },
+    { value: "02", name: "Februar" },
+    { value: "03", name: "Marts" },
+    { value: "04", name: "April" },
+    { value: "05", name: "Maj" },
+    { value: "06", name: "Juni" },
+    { value: "07", name: "Juli" },
+    { value: "08", name: "August" },
+    { value: "09", name: "September" },
+    { value: "10", name: "Oktober" },
+    { value: "11", name: "November" },
+    { value: "12", name: "December" }
+  ];
+  months.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.value;
+    opt.textContent = m.name;
+    monthDropdown.appendChild(opt);
+  });
+
+  loadDashboardData();
+});
+
+async function loadDashboardData() {
+  const year = document.getElementById("periodeYear").value;
+  const month = document.getElementById("periodeMonth").value;
+
+  let periode = "Alltime";
+  if (year !== "Alltime") {
+    periode = month ? `${year}-${month}` : year;
+  }
+
+  const res = await fetch("https://getlabeldashboard-508230159904.europe-west1.run.app", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${idToken}`
+    },
+    body: JSON.stringify({ periode })
+  });
+
+  const data = await res.json();
+  if (!data || data.error) {
+    alert("Fejl: Kunne ikke hente dashboard-data.");
+    return;
+  }
+
+  // Update total revenue
+  console.log("API response:", data);
+  document.getElementById("totalRevenue").textContent = data.totalRevenue;
+
+  // Render Top Artists Table
+  const artistTable = document.getElementById("topArtistsTable");
+  artistTable.innerHTML = "";
+  if (data.topArtists.length > 0) {
+    data.topArtists.forEach((entry, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index + 1}.</td>
+        <td>${entry.name}</td>
+        <td style="text-align: right;">${entry.amount}</td>
+      `;
+      artistTable.appendChild(row);
+    });
+  } else {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="3">Ingen data</td>`;
+    artistTable.appendChild(row);
+  }
+
+  // Render Top Songs Table
+  const songTable = document.getElementById("topSongsTable");
+  songTable.innerHTML = "";
+  if (data.topSongs.length > 0) {
+    data.topSongs.forEach((entry, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index + 1}.</td>
+        <td>${entry.title}</td>
+        <td>${entry.artist}</td>
+        <td style="text-align: right;">${entry.amount}</td>
+      `;
+      songTable.appendChild(row);
+    });
+  } else {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="4">Ingen data</td>`;
+    songTable.appendChild(row);
+  }
+}
+</script>
+</body>
+</html>
