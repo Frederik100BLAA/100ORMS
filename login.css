@@ -1,0 +1,119 @@
+/* login.css — Updated to match mockup white/blue design */
+
+@font-face {
+  font-family: 'Dunbar';
+  src: url('/fonts/dunbar-text-medium.ttf') format('truetype');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'MinionPro';
+  src: url('/fonts/MinionPro-Regular.otf') format('opentype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'MinionPro';
+  src: url('/fonts/MinionPro-Semibold.otf') format('opentype');
+  font-weight: 600;
+}
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #1a1a1a;
+  --primary-color: #3A57A3;
+  --primary-hover: #2f478b;
+  --border-color: #E0E0E0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Dunbar', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-logo {
+  max-width: 300px; /* increased from 120px */
+  margin-bottom: 2rem;
+}
+
+.login-container {
+  background-color: #fff;
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+
+.login-container h1 {
+  font-family: 'Dunbar', sans-serif;
+  font-weight: 500;
+  font-size: 1.75rem;
+  margin-bottom: 1.25rem;
+  color: var(--primary-color);
+}
+
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-family: 'Dunbar', sans-serif;
+  background-color: #fff;
+  color: var(--text-color);
+  transition: border-color 0.2s ease;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-family: 'Dunbar', sans-serif;
+  font-size: 1rem;
+  box-sizing: border-box;
+  line-height: 1.25;
+  vertical-align: middle;
+}
+
+
+button {
+  width: 100%;
+  padding: 0.9rem 1.25rem;
+  background-color: var(--primary-color);
+  color: #fff;
+  font-size: 1rem;
+  font-family: 'Dunbar', sans-serif;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}
