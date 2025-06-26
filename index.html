@@ -2,97 +2,74 @@
 <html lang="da">
 <head>
   <meta charset="UTF-8">
-  <title>Login – 100Blaa Portal</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 100px;
-      background-color: #f4f4f4;
-    }
-    .g_id_signin {
-      margin-top: 20px;
-    }
-    button {
-      font-size: 1em;
-      padding: 10px 20px;
-      margin-top: 20px;
-      background-color: #000;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      padding: 4px 0;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log ind - 100ORMS</title>
+  <link rel="stylesheet" href="css/login.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-  <h1>Velkommen til 100Blaa Portal</h1>
-  <p>Log ind med din Google-konto</p>
+  <div class="login-wrapper">
+  <img src="css/img/Logo-Outline-Blå@2x.png" alt="100ORMS Logo" class="login-logo">
 
-  <!-- Google Sign-In -->
-  <div id="g_id_onload"
-       data-client_id="508230159904-ohpvhkojf88spabsqm5m3n55mu60vbqq.apps.googleusercontent.com"
-       data-context="signin"
-       data-callback="handleCredentialResponse"
-       data-auto_prompt="false">
+  <div class="login-container">
+    <h1>Log ind på 100ORMS</h1>
+    <input type="email" id="email" placeholder="E-mail">
+    <input type="password" id="password" placeholder="Adgangskode">
+    <button onclick="loginWithEmailPassword()">Log ind</button>
   </div>
-
-  <div class="g_id_signin"
-       data-type="standard"
-       data-shape="pill"
-       data-theme="outline"
-       data-text="signin_with"
-       data-size="large">
-  </div>
+</div>
 
   <script>
-    async function handleCredentialResponse(response) {
-      const jwt = response.credential;
-      const payload = JSON.parse(atob(jwt.split('.')[1]));
-      const email = payload.email;
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsRhXGH4eO1qJ2AT4KpeRCzTLo_as7r6Q",
+      authDomain: "orms-system.firebaseapp.com",
+      projectId: "orms-system",
+      storageBucket: "orms-system.firebasestorage.app",
+      messagingSenderId: "508230159904",
+      appId: "1:508230159904:web:51b075ea7a27852bcff645",
+      measurementId: "G-G00BNCX6CR"
+    };
 
-      // Replace with your deployed Web App URL
-      const rawUrl = `https://script.google.com/macros/s/AKfycbxtT5WtCl81hfrYdFquIrXj-D2nkb2rOveMIanvJHem84IAi0f1IKlyu2MuEJP05kYxUg/exec=${encodeURIComponent(email)}`;
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    async function loginWithEmailPassword() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
       try {
-        const res = await fetch(rawUrl);
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        console.log("Signed in user:", userCredential.user.email);
+        const user = userCredential.user;
+
+        const idToken = await user.getIdToken(true);
+        console.log("Signed in user:", user.email);
+        console.log("Token:", idToken);
+
+        const res = await fetch("https://checkuserrole-508230159904.europe-west1.run.app", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ email })
+        });
+
         const data = await res.json();
 
-        if (data.error) {
-          alert(data.error);
-          return;
+        if (data.role === "artist") {
+          window.location.href = "artist.html";
+        } else if (data.role === "label") {
+          window.location.href = "label.html";
+        } else {
+          alert("Din e-mail har ikke adgang til systemet.");
         }
 
-        if (data.label) {
-          document.body.innerHTML = `
-            <h2>Velkommen, ${payload.name} (Label)</h2>
-            <p>Du har adgang til administrationsportalen.</p>
-            <button onclick="signOut()">Log ud</button>
-          `;
-        } else if (data.artist) {
-          document.body.innerHTML = `
-            <h2>Velkommen, ${payload.name}</h2>
-            <p>Du er logget ind som artist: <strong>${data.artist}</strong></p>
-            <button onclick="signOut()">Log ud</button>
-          `;
-        }
-      } catch (err) {
-        console.error("Login-fejl:", err);
-        alert("Noget gik galt under login. Prøv igen.");
+      } catch (error) {
+        console.error("Login-fejl:", error);
+        alert("Forkert e-mail eller adgangskode.");
       }
-    }
-
-    function signOut() {
-      google.accounts.id.disableAutoSelect();
-      window.location.reload();
     }
   </script>
 </body>
