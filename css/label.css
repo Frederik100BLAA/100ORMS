@@ -1,0 +1,245 @@
+/* Load custom Dunbar font */
+@font-face {
+  font-family: 'Dunbar';
+  src: url('fonts/dunbar-text-medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MinionPro';
+  src: url('fonts/MinionPro-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MinionPro';
+  src: url('fonts/MinionPro-Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MinionProBoldCn';
+  src: url('fonts/MinionPro-BoldCn.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Base styles */
+body {
+  margin: 0;
+  font-family: 'Dunbar', sans-serif;
+  display: flex;
+  background-color: white;
+  color: #111;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #4054a4;
+  color: white;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  position: relative;
+  padding: 2rem 1rem;
+}
+
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar-top img {
+  width: 100px;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.3rem;
+  margin-bottom: 0;
+}
+
+.sidebar-nav-wrapper {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: -2rem; /* ⬅️ nudges the nav links downward closer to center */
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+.sidebar-nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-nav a.active {
+  opacity: 0.4;
+}
+
+.sidebar-bottom {
+  margin-bottom: 1rem;
+}
+
+.ny-button {
+  background-color: white;
+  color: #4054a4;
+  font-weight: bold;
+  border: none;
+  padding: 0.6rem 4rem; /* ⬅️ wider button */
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Main Content Area */
+.main {
+  flex-grow: 1;
+  padding: 3rem;
+  position: relative;
+}
+
+/* Revenue Section */
+.revenue-section .label {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.total-indtaegt {
+  font-family: 'MinionProBoldCn', serif;
+  font-size: 9rem;
+  font-weight: bold;
+  color: #4054a4;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.filter-section label {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.filter-section select {
+  font-size: 1.2rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  color: #111;
+}
+
+/* Fixed Bottom Tables Section */
+.top-section {
+  position: fixed;
+  bottom: 2rem;
+  left: 240px;
+  right: 2rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  pointer-events: none;
+}
+
+.top-box {
+  background-color: #f0f2fa;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 420px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  pointer-events: auto;
+}
+
+.top-box h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #4054a4;
+}
+
+.top-box ol {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.top-box li {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #4054a4;
+}
+
+.bottom-tables {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  margin-top: 20rem;
+  padding: 0 2rem 2rem 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+
+.table-block {
+  width: 100%;
+}
+
+.table-heading {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4054a4;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.artist-table td,
+.song-table td {
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  color: #111;
+}
+
+.artist-table td:nth-child(3),
+.song-table td:last-child {
+  text-align: right;
+}
+
+.song-table td:nth-child(2) {
+  padding-left: 1rem;
+}
+
+.song-table td:nth-child(3) {
+  padding-left: 1rem;
+}
+
